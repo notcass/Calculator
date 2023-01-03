@@ -4,7 +4,9 @@
     -Start with basic design/buttons using html
     -Create parser for a string of operations
     -Clean up design afterwards
-    -PEMDAS   o_o
+    -PEMDAS o_o   --ignore parenthesis on the first attempt, come back later
+    OK apparently even the windows calculators don't do pemdas at all
+
 
   FIXME:
     -Prevent screen from getting wider than the calc
@@ -37,7 +39,7 @@ document.querySelectorAll('.operation').forEach((el) => {
 });
 
 // Equals event listener
-document.getElementById(DOM.equals).addEventListener('click', result);
+document.getElementById(DOM.equals).addEventListener('click', parser);
 
 // Clear Screen event listener
 document.getElementById(DOM.C).addEventListener('click', clearScreen);
@@ -51,19 +53,45 @@ function updateScreen(str) {
   $(DOM.screen).textContent += str;
 }
 
-function result() {
-  console.log('Result');
-  // Parse screen
-  /*
-      ---Ideas?---
-  Store everything in array
-  arr.forEach(item => {
-    switch(item)
-  })
-
-  */
+function parser() {
+  // Array of items on screen
   let screenStr = $(DOM.screen).textContent;
-  console.log(screenStr.split(' '));
+  screenStr = screenStr.split(' ');
+
+  // Empty Result
+  let result = 0;
+
+  // Loop through screen text
+  screenStr.forEach((item, index) => {
+    let prevItem = parseInt(screenStr[index - 1]);
+    let nextItem = parseInt(screenStr[index + 1]);
+
+    // If current item is a number and result is 0
+    if (!isNaN(item) && result == 0) {
+      // Set the result to the item
+      result = parseInt(item);
+
+      // Else, if item is an operator and prev and next are numbers
+    } else if (isOperator(item) && !isNaN(prevItem) && !isNaN(nextItem)) {
+      // Figure out which operator it is and calculate the next result
+      switch (item) {
+        case '+':
+          result += nextItem;
+          break;
+        case '-':
+          result -= nextItem;
+          break;
+      }
+    }
+  });
+
+  // Update the screen with the new result
+  clearScreen();
+  updateScreen(result);
+}
+
+function isOperator(str) {
+  return str == '+' || str == '-' || str == '*' || str == '/';
 }
 
 function $(x) {
