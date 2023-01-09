@@ -52,6 +52,29 @@ html {
 
 .buttons {
   margin: auto;
+  margin-top: -88px;
+}
+
+.btn-tall {
+  position: absolute;
+  height: 212px;
+  margin-top: -52px;
+}
+.btn-wide {
+  position: absolute;
+  width: 293px;
+  height: auto;
+}
+#btn-decimal {
+  position: absolute;
+  height: auto;
+  translate: 148px;
+}
+
+#btn-sqrt {
+  font-size: 70px;
+  height: 104px;
+  width: 144px;
 }
 
 button {
@@ -74,7 +97,7 @@ button:hover {
   cursor: pointer;
 }
 
-#btn-\= {
+#btn-equals {
   align-items: right;
 }
 

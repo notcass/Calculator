@@ -7,26 +7,21 @@
   TODO:
     !!DONE!! -Start with basic design/buttons using html
     !!DONE!! -Create parser for a string of operations
-    -Clean up design afterwards
-    -PEMDAS o_o   --ignore parenthesis on the first attempt, come back later
-    OK apparently even the windows calculators don't do pemdas at all
+    !!DONE!! -Clean up design afterwards
+    !!DONE!! -Don't automatically clear last result. Let user create an expression
+    from the last result, instead of clearing the last result when a new
+    number is entered.
+    !!DONE!! -Fix Add button positioning
+    !!DONE!! -Refactor this mess
 
-
-  FIXME:
-    -Prevent screen from getting wider than the calc
-    when too many numbers are added and then
-    pushing the buttons off the calc also.
-
-
+    -Add backspace function
 
 */
 
 const DOM = {
-  CE: 'btn-CE',
   C: 'btn-C',
-  screen: 'screen',
   screenText: 'screen-text',
-  equals: 'btn-=',
+  equals: 'btn-equals',
 };
 let clearScreenFlag = false;
 
@@ -35,91 +30,67 @@ function clearScreen() {
 }
 
 function updateScreen(str) {
+  // If I press 2 + 2 and the screen says 4
+  // If I then press 3, I don't want the screen to show 43, I want it to replace 4 with 3
+  // This code block handles that
   if (clearScreenFlag) {
     clearScreenFlag = false;
-    clearScreen();
+    if (!isOperator(str.trim())) {
+      clearScreen();
+    }
   }
 
-  let screenText = $(DOM.screenText).textContent;
+  let screen = $(DOM.screenText);
 
-  if (screenText != '0') {
-    // console.log('Not zero');
-    // console.log(`Str is ${str}`);
-    $(DOM.screenText).textContent += str;
+  if (screen.textContent == '0') {
+    // Replace Screen Text with str
+    screen.textContent = str;
   } else {
-    // console.log('is zero');
-    // console.log(`Str is ${str}`);
-    $(DOM.screenText).textContent = str;
+    // Add str to Screen Text
+    screen.textContent += str;
   }
 }
 
 function parser() {
   // Array of items on screen
-  let screenStr = $(DOM.screen).textContent;
-  screenStr = screenStr.split(' ');
+  let screenStr = $(DOM.screenText).textContent.trim().split(' ');
+  screenStr = screenStr.filter((n) => n != '');
+  console.log(screenStr);
 
   // Empty Result
   let result = 0;
 
   // Invalid expression flag
-  let invalid = false;
+  let valid = false;
 
-  // If array is only one number, ignore 'accidental' parse
-  // request and let user continue constructing the expression
-  if (screenStr.length != 1) {
-    // Loop through screen text
-    screenStr.forEach((item, index) => {
-      let prevItem = parseInt(screenStr[index - 1]);
-      let nextItem = parseInt(screenStr[index + 1]);
-      // console.log(`prevItem: ${prevItem}`);
-      // console.log(`nextItem: ${nextItem}`);
+  // Loop through screen text
+  screenStr.forEach((item, index) => {
+    let prevItem = parseFloat(screenStr[index - 1]);
+    let nextItem = parseFloat(screenStr[index + 1]);
 
-      // Check for invalid expression
-      // if current and next are both numbers  or current and next are both NOT numbers
-      if (
-        (!isNaN(item) && !isNaN(nextItem)) ||
-        (isNaN(item) && isNaN(nextItem))
-      ) {
-        console.log('INVALID');
-        invalid = true;
-      } else {
-        // If current item is a number and we're at the first item
-        if (!isNaN(item) && index == 0) {
-          // Set the result to the item
-          result = parseInt(item);
+    // Check for invalid expression
+    // if current and next are both numbers  or current and next are both NOT numbers
+    valid = isValidSequence(item, nextItem);
 
-          // Else, if item is an operator and prev and next are numbers
-        } else if (isOperator(item) && !isNaN(prevItem) && !isNaN(nextItem)) {
-          // Figure out which operator it is and calculate the next result
-          switch (item) {
-            case '+':
-              result += nextItem;
-              console.log(`${result} + ${nextItem}`);
-              break;
-            case '-':
-              result -= nextItem;
-              console.log(`${result} - ${nextItem}`);
+    if (valid) {
+      // If current item is a number and we're at the first item
+      if (!isNaN(item) && index == 0) {
+        // Set the result to the item
+        result = parseFloat(item);
 
-              break;
-            case '*':
-              result *= nextItem;
-              break;
-            case '/':
-              result /= nextItem;
-              break;
-          }
-        }
+        // Else, if item is an operator and prev and next are numbers
+      } else if (isOperator(item) && !isNaN(prevItem) && !isNaN(nextItem)) {
+        // Evaluate the expression
+        eval(`result ${item}= nextItem;`);
       }
-    });
-
-    // Update the screen with the new result
-    if (!invalid) {
-      clearScreen();
-      updateScreen(result);
-      clearScreenFlag = true;
-    } else {
-      clearScreen();
     }
+  });
+
+  // Update the screen with the new result
+  clearScreen();
+  if (valid) {
+    updateScreen(result);
+    clearScreenFlag = true;
   }
 }
 
@@ -127,18 +98,36 @@ function isOperator(str) {
   return str == '+' || str == '-' || str == '*' || str == '/';
 }
 
-(function () {
-  // Digit event listeners
+function isValidSequence(item, nextItem) {
+  // If current and next are matching, return false
+  return !(
+    (isNumber(item) && isNumber(nextItem)) ||
+    (isNaN(item) && isNaN(nextItem))
+  );
+}
+
+function setupEventListeners() {
+  // Digit keys' event listeners
   $$('.digit').forEach((el) => {
     el.addEventListener('click', () => {
       updateScreen(el.textContent);
     });
+
+    // Prevent enter key from triggering the digit keys
+    el.addEventListener('keydown', (e) => {
+      e.preventDefault();
+    });
   });
 
-  // Operation event listeners
+  // Operation keys' event listeners
   $$('.operation').forEach((el) => {
     el.addEventListener('click', () => {
       updateScreen(` ${el.textContent} `);
+    });
+
+    // Prevent enter key from triggering the operator keys
+    el.addEventListener('keydown', (e) => {
+      e.preventDefault();
     });
   });
 
@@ -147,14 +136,13 @@ function isOperator(str) {
 
   // Clear Screen event listener
   $(DOM.C).addEventListener('click', clearScreen);
-  $(DOM.CE).addEventListener('click', clearScreen);
 
   // Keyboard keybinds
   document.addEventListener('keydown', (key) => {
     // If enough space in the box
     if ($(DOM.screenText).textContent.length < 57) {
       // If digit key
-      if (!isNaN(key.key)) {
+      if (isNumber(key.key) && key.key != ' ') {
         updateScreen(key.key);
       }
 
@@ -175,7 +163,7 @@ function isOperator(str) {
       }
     }
   });
-})();
+}
 
 function $(x) {
   return document.getElementById(x);
@@ -184,3 +172,9 @@ function $(x) {
 function $$(x) {
   return document.querySelectorAll(x);
 }
+
+function isNumber(n) {
+  return !isNaN(n);
+}
+
+setupEventListeners();

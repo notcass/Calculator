@@ -6,44 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <title>Calculator</title>
+    <script type="text/javascript">
+      function noenter() {
+        return !(window.event && window.event.keyCode == 13);
+      }
+    </script>
   </head>
   <body>
     <!-- <h1>Calculator!</h1> -->
     <div id="calc-body">
-      <div id="screen"><div id="screen-text">15 - 15</div></div>
+      <div id="screen"><div id="screen-text">0</div></div>
       <div id="buttons-container">
         <table class="buttons">
           <tr>
-            <td><button id="btn-CE">EC</button></td>
             <td><button id="btn-C">C</button></td>
-            <td><button class="operation" id="btn-*">*</button></td>
-            <td><button class="operation" id="btn-/">/</button></td>
+            <td><button class="operation" id="btn-divide">/</button></td>
+            <!-- <td><button class="btn-empty"></button></td> -->
+            <td><button class="operation" id="btn-multiply">*</button></td>
+            <td><button class="operation" id="btn-minus">-</button></td>
           </tr>
 
           <tr>
             <td><button class="digit" id="btn-7">7</button></td>
             <td><button class="digit" id="btn-8">8</button></td>
             <td><button class="digit" id="btn-9">9</button></td>
-            <td><button class="operation" id="btn-+">+</button></td>
+            <td id="td-add">
+              <button class="operation btn-tall" id="btn-add">+</button>
+            </td>
           </tr>
           <tr>
             <td><button class="digit" id="btn-4">4</button></td>
             <td><button class="digit" id="btn-5">5</button></td>
             <td><button class="digit" id="btn-6">6</button></td>
-            <td><button class="operation" id="btn--">-</button></td>
           </tr>
 
           <tr>
             <td><button class="digit" id="btn-1">1</button></td>
             <td><button class="digit" id="btn-2">2</button></td>
             <td><button class="digit" id="btn-3">3</button></td>
-            <td><button id="btn-=">=</button></td>
+            <td><button class="btn-tall" id="btn-equals">=</button></td>
           </tr>
 
           <tr>
-            <td><button class="btn-empty"></button></td>
-            <td><button class="digit" id="btn-0">0</button></td>
-            <td><button class="btn-empty"></button></td>
+            <!-- <td><button id="btn-backspace"><--</button></td> -->
+            <td class="td-wide">
+              <button class="digit btn-wide" id="btn-0">0</button>
+            </td>
+            <td><button class="digit" id="btn-decimal">.</button></td>
+            <!-- <td><button class="btn-empty"></button></td> -->
           </tr>
         </table>
       </div>
