@@ -1,7 +1,18 @@
 'use strict';
 /*
 
-          ~~~~ Calculator without using eval() ~~~~
+                    ~~~~ Calculator without using eval()... (kind of) ~~~~
+
+  I sort of did this project backwards. I originally coded it so you could create
+  any sequence of Digits and Operations on the screen. Then the parser would check if it's
+  valid, and act according. As I started to add features, I got to the point where I was
+  writing it so you couldn't create an invalid expression, and there was no need for a parser.
+  I think every expression has to be [Digit, Operation, Digit, Operation,...].
+  It seems the smart way to write this would've been preventing the user from entering 2
+  operators in a row, then just evaluating the expression if the last item on the screen
+  is a number. calc.js will have the new code.
+
+
 
 
   TODO:
@@ -13,8 +24,13 @@
     number is entered.
     !!DONE!! -Fix Add button positioning
     !!DONE!! -Refactor this mess
+    -If screen is empty, prevent from adding an operation as the first item
 
     -Add backspace function
+
+  FIXME:
+    -Decimal Keybind
+    !!DONE!! -Error when hitting enter multiple times in a row
 
 */
 
@@ -43,8 +59,11 @@ function updateScreen(str) {
   let screen = $(DOM.screenText);
 
   if (screen.textContent == '0') {
-    // Replace Screen Text with str
-    screen.textContent = str;
+    // If str isn't an operator
+    if (!isOperator(str.trim())) {
+      // Replace Screen Text with str
+      screen.textContent = str;
+    }
   } else {
     // Add str to Screen Text
     screen.textContent += str;
@@ -55,21 +74,16 @@ function parser() {
   // Array of items on screen
   let screenStr = $(DOM.screenText).textContent.trim().split(' ');
   screenStr = screenStr.filter((n) => n != '');
-  console.log(screenStr);
+  // console.log(screenStr);
 
-  // Empty Result
   let result = 0;
-
-  // Invalid expression flag
   let valid = false;
 
   // Loop through screen text
-  screenStr.forEach((item, index) => {
+  screenStr.every((item, index) => {
     let prevItem = parseFloat(screenStr[index - 1]);
     let nextItem = parseFloat(screenStr[index + 1]);
 
-    // Check for invalid expression
-    // if current and next are both numbers  or current and next are both NOT numbers
     valid = isValidSequence(item, nextItem);
 
     if (valid) {
@@ -79,27 +93,30 @@ function parser() {
         result = parseFloat(item);
 
         // Else, if item is an operator and prev and next are numbers
-      } else if (isOperator(item) && !isNaN(prevItem) && !isNaN(nextItem)) {
-        // Evaluate the expression
+      } else if (isOperator(item) && isNumber(prevItem) && isNumber(nextItem)) {
         eval(`result ${item}= nextItem;`);
       }
+      return true;
+    } else {
+      return false;
     }
   });
 
-  // Update the screen with the new result
+  // Update the screen
   clearScreen();
+
   if (valid) {
-    updateScreen(result);
+    updateScreen(result.toString());
     clearScreenFlag = true;
   }
 }
 
 function isOperator(str) {
+  // return str.match(/[\+\-\/\*]/); <- ugly
   return str == '+' || str == '-' || str == '*' || str == '/';
 }
 
 function isValidSequence(item, nextItem) {
-  // If current and next are matching, return false
   return !(
     (isNumber(item) && isNumber(nextItem)) ||
     (isNaN(item) && isNaN(nextItem))
@@ -107,7 +124,7 @@ function isValidSequence(item, nextItem) {
 }
 
 function setupEventListeners() {
-  // Digit keys' event listeners
+  // Digit keys' event listener
   $$('.digit').forEach((el) => {
     el.addEventListener('click', () => {
       updateScreen(el.textContent);

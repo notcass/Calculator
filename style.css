@@ -1,5 +1,6 @@
 html {
-  background-color: darkorchid;
+  /* background-color: darkorchid; */
+  background-color: #111;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -52,13 +53,13 @@ html {
 
 .buttons {
   margin: auto;
-  margin-top: -88px;
+  margin-top: -105px;
 }
 
 .btn-tall {
   position: absolute;
-  height: 212px;
-  margin-top: -52px;
+  height: 221px;
+  margin-top: -54px;
 }
 .btn-wide {
   position: absolute;
@@ -78,13 +79,15 @@ html {
 }
 
 button {
-  background-color: rgb(205, 205, 205);
+  background-color: rgb(235, 235, 235);
   color: rgb(40, 40, 40);
 
   width: 1.8em;
   height: 35%;
   border: 5px solid black;
   border-radius: var(--radius);
+  /* border: 1px solid grey;
+  border-radius: 7px; */
   transition: transform 0.1s;
   font-size: 5em;
 }
@@ -95,10 +98,6 @@ button:active {
 
 button:hover {
   cursor: pointer;
-}
-
-#btn-equals {
-  align-items: right;
 }
 
 .btn-empty {
