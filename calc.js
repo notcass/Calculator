@@ -1,6 +1,5 @@
 'use strict';
 /*
-
                     ~~~~ Calculator without using eval()... (kind of) ~~~~
 
   I sort of did this project backwards. I originally coded it so you could create
@@ -10,27 +9,7 @@
   I think every expression has to be [Digit, Operation, Digit, Operation,...].
   It seems the smart way to write this would've been preventing the user from entering 2
   operators in a row, then just evaluating the expression if the last item on the screen
-  is a number. calc.js will have the new code.
-
-
-
-
-  TODO:
-    !!DONE!! -Start with basic design/buttons using html
-    !!DONE!! -Create parser for a string of operations
-    !!DONE!! -Clean up design afterwards
-    !!DONE!! -Don't automatically clear last result. Let user create an expression
-    from the last result, instead of clearing the last result when a new
-    number is entered.
-    !!DONE!! -Fix Add button positioning
-    !!DONE!! -Refactor this mess
-    -If screen is empty, prevent from adding an operation as the first item
-
-    -Add backspace function
-
-  FIXME:
-    -Decimal Keybind
-    !!DONE!! -Error when hitting enter multiple times in a row
+  is a number. calc.js will have the old code.
 
 */
 
